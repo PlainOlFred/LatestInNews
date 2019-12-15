@@ -19,7 +19,8 @@
     "cheerio": "^0.20.0",
     "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
-    "mongojs": "^2.6.0"
+    "mongojs": "^3.1.0",
+    "mongoose": "^5.8.1"
   },
   "bugs": {
     "url": "https://github.com/PlainOlFred/LatestInNews/issues"
