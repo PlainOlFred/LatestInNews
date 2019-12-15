@@ -10,23 +10,47 @@ const
 
 const 
   dbURL = 'lastestInNews',
-  collections = ['articles']; // only on collection so far
+  collections = ['articles', 'trailers']; 
 
 const db = mongojs(dbURL, collections)
 db.on("error", error => console.log(`Database Error: ${error}`));
 
+/*************************
+   HOME PAGE
+**************************/
 app.get('/', (req, res) => {
   res.send("HomePage")
 })
 
+/*************************
+   GET ARTICLES 
+**************************/
+app.get('/articles', (req, res) => {
+  db.articles.find({}, (err, data) => {
+    err ? console.log(err) : res.send(data);
+  })
+})
+
+/*************************
+   GET TRAILER 
+**************************/
+app.get('/trailers', (req, res) => {
+  db.trailers.find({}, (err, data) => {
+    err ? console.log(err) : res.send(data);
+  })
+
+})
+
+
+/*************************
+   SCRAPING ARTICLES
+**************************/
 app.get('/scrape-articles', (req, res) => {
   console.log('*****Scarpping Articles from Cinemblend *****');
 
-  const results = []; 
-
   axios.get('https://www.cinemablend.com/news.php').then(response => {
 
-    let $ = cheerio.load(response.data)
+    const $ = cheerio.load(response.data)
 
     $('div.story_item').each((i, element) => {
 
@@ -51,30 +75,28 @@ app.get('/scrape-articles', (req, res) => {
           .children('a')
           .children('img')['0']
           .attribs.src;
-   
-      results.push({
-        i,
-        headline,
-        summary,
-        url,
-        author,
-        date,
-        img
+
       
-      });
+      if (headline && summary && url && author && date && img ) {
+        db.articles.insert({
+            headline,
+            summary,
+            url,
+            author,
+            date,
+            img
+        },
+          (err, inserted) => err ? console.log(err) : console.log(inserted));
+      }
+      
     });
-
-    // Log the results once you've looped through each of the elements found with cheerio
-    console.log(results[0]);
-    res.json(results)
   })
-  
 })
-
+/*************************
+   SCRAPING TRAILERS
+**************************/
 app.get('/scrape-trailers', (req, res) => {
   console.log('*****Scarpping Trailers from Cinemblend *****');
-
-  const results = []; 
 
   axios.get('https://www.cinemablend.com/trailers/').then(response => {
 
@@ -103,25 +125,19 @@ app.get('/scrape-trailers', (req, res) => {
           .children('img')['0']
           .attribs.src;
    
-      results.push({
-        i,
-        headline,
-        summary,
-        url,
-        author,
-        date,
-        img
-      
-      });
+      if (headline && summary && url && author && date && img ) {
+        db.trailers.insert({
+            headline,
+            summary,
+            url,
+            author,
+            date,
+            img
+        },
+          (err, inserted) => err ? console.log(err) : console.log(inserted));
+      }
     });
-
-    // Log the results once you've looped through each of the elements found with cheerio
-    console.log(results[0]);
-
-    
-    res.json(results)
   })
-
 
 })
 
