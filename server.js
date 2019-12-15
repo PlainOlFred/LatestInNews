@@ -2,11 +2,15 @@ const
   express = require('express'),
   mongojs = require('mongojs'),
   axios = require('axios'),
-  cheerio = require('cheerio');
+  cheerio = require('cheerio'),
+  mongoose = require('mongoose');
+  
 
 const 
   app = express(),
   PORT = process.env.PORT || 3500;
+
+app.use(express.static('public'));
 
 const 
   dbURL = 'lastestInNews',
@@ -41,7 +45,8 @@ app.get('/trailers', (req, res) => {
 
 })
 
-
+//ADD CHECK FOR ARTICLES ALREADY IF DB
+//check Headline and author
 /*************************
    SCRAPING ARTICLES
 **************************/
