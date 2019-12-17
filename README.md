@@ -16,7 +16,9 @@ View the lastest in news and express your opinion
 
 ## Developmental Features
   - [ ] Show dates for comments
+  - [ ] Users login
   - [ ] Edit comments
+  - [ ] Save posts
   
 
 ## Technologies USe
