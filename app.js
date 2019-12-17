@@ -22,7 +22,7 @@ app.set('view engine', 'handlebars');
 /*************************
    Mongoose ORM
 **************************/
-mongoose.connect("mongodb://localhost/lastestInNews", {
+mongoose.connect("mongodb://localhost/latestInNews", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
@@ -44,27 +44,30 @@ db.once("open", () => {
     headline: String,
     summary: String,
     url: String,
-    postType: String
+    postType: String,
+    comments: Array
   })
 
   const trailersSchema = new mongoose.Schema({
     headline: String,
     summary: String,
     url: String,
-    postType: String
+    postType: String,
+    comments: Array
   });
 
-  const CommentsSchema = new mongoose.Schema({
-    user: {
+  const commentsSchema = new mongoose.Schema({
+    user_id: {
       type: String,
-      required: "Must have"
+      required: "Must have" 
     },
-    comment: String,
-    type: String,
-    targetID: {
-      type: String,
-      required: "Must have"
+    text: {
+      type: String
+    },
+    post_id: {
+      type: String
     }
+    
   });
 
   const usersSchema = new mongoose.Schema({
@@ -74,7 +77,7 @@ db.once("open", () => {
       required: "Must have"
     },
     lasttName: {
-      type: String,
+      type: String, 
       trim: true,
       required: "Must have"
     },
@@ -92,6 +95,7 @@ db.once("open", () => {
   **************************/
   const Article = mongoose.model("Article", articlesSchema);
   const Trailer = mongoose.model("Trailer", trailersSchema);
+  const Comment = mongoose.model("Comment", commentsSchema)
 
   /*************************
    HOME PAGE
@@ -101,49 +105,16 @@ db.once("open", () => {
   });
 
   /*************************
-    GET ARTICLES 
+    SCRAPE AND GET ARTICLES 
   **************************/
   app.get("/articles", (req, res) => {
-    Article.find({}, function (err, articles){
-      
-      if (err) {
-        console.log(err)
-      } else {
-         let hbsObject = {
-            articles
-          };
-          console.log("Here" + hbsObject.articles);
-        res.render("home", hbsObject)
-      }
-      
-    });
-   
-  });
 
-
-  /*************************
-     GET TRAILER 
-  **************************/
-  app.get("/trailers", (req, res) => {
-    Trailer.find({}, (err, trailers) => {
-       if (err) {
-        console.log(err)
-      } else {
-         let hbsObject = {
-            trailers
-          };
-          console.log("Here" + hbsObject.trailers);
-        res.render("home", hbsObject)
-      }
-    });
-  });
-
-  //ADD CHECK FOR ARTICLES ALREADY IF DB
+    //ADD CHECK FOR ARTICLES ALREADY IF DB
   //check Headline and author
   /*************************
      SCRAPING ARTICLES
   **************************/
-  app.get("/scrape-articles", (req, res) => {
+  
     console.log("*****Scarpping Articles from Cinemblend *****");
 
     axios.get("https://www.cinemablend.com/news.php").then(response => {
@@ -184,13 +155,39 @@ db.once("open", () => {
         }
       });
     });
-  });
-  /*************************
-     SCRAPING TRAILERS
-  **************************/
-  app.get("/scrape-trailers", (req, res) => {
-    console.log("*****Scarpping Trailers from Cinemblend *****");
+  
 
+
+
+
+    /*************************
+       GETTING ARTICLES
+    **************************/
+    Article.find({}, function (err, articles){
+      
+      if (err) {
+        console.log(err)
+      } else {
+         let hbsObject = {
+            articles
+          };
+          console.log("Here" + hbsObject.articles);
+        res.render("home", hbsObject)
+      }
+      
+    });
+   
+  });
+
+  /*************************
+     SCRAPE AND GET TRAILER 
+  **************************/
+  app.get("/trailers", (req, res) => {
+
+    /*************************
+       SCRAPING TRAILERS
+    **************************/
+    console.log("*****Scarpping Trailers from Cinemblend *****");
     axios.get("https://www.cinemablend.com/trailers/").then(response => {
       let $ = cheerio.load(response.data);
       $("div.story_item").each((i, element) => {
@@ -228,7 +225,109 @@ db.once("open", () => {
         }
       });
     });
+  
+    Trailer.find({}, (err, trailers) => {
+       if (err) {
+        console.log(err)
+      } else {
+         let hbsObject = {
+            trailers
+          };
+          console.log("Here" + hbsObject.trailers);
+        res.render("home", hbsObject)
+      }
+    });
   });
+
+  /*************************
+     COMMENT PAGE
+  **************************/
+ app.get("/comments/:postType/:postId", (req, res) => {
+   
+
+   let postType = req.params.postType;
+   let postId = req.params.postId;
+   let hbsObject = {};
+  
+   
+   switch(postType) {
+     case 'article':
+  
+       Article.find({_id: postId} , function (err, post){
+        
+        if (err) {
+          console.log(err)
+        } else {
+          hbsObject.post = post;
+          console.log(hbsObject.post);
+          // res.render("comments", hbsObject)
+        }
+        
+      });
+      
+       break;
+    case 'trailer':
+      
+
+       Trailer.find({_id: postId} , function (err, post){
+      
+        if (err) {
+          console.log(err)
+        } else {
+          console.log(hbsObject)
+            
+          // res.render("comments", hbsObject)
+        }
+        
+      });
+
+      break;
+    default:
+      console.log('no page')
+   }
+
+
+   Comment.find({post_id: postId},  function (err, comments) {
+    if (err) {
+          console.log(err)
+        } else {
+          hbsObject.comments = comments;
+            
+           console.log(hbsObject); 
+          res.render("comments", hbsObject)
+        }
+
+  })
+
+  
+ })
+
+ app.post("/api/comments/", (req,res) => {
+   let 
+    post_id = req.body.post_id,
+    user_id = 'USER DEFAULT',
+    text = req.body.user_comment;
+
+  console.log("posting comment");
+  
+  
+   let comment = new Comment({user_id, text, post_id});
+
+   comment.save(function(err, comment) {
+     err ? console.error(err) : console.log(comment)
+   })
+
+
+ })
+
+app.get("comments/:postId", (req, res) => {
+  let postId = req.params.postId;
+
+  
+
+})
+
+  
 });
 
 /*************************
