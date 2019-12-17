@@ -1,4 +1,3 @@
-
 const 
   express = require("express"),
   exphbs  = require('express-handlebars');
@@ -6,6 +5,10 @@ const
   axios = require("axios"),
   cheerio = require("cheerio"),
   mongoose = require("mongoose");
+
+  const Article = require('./models/articleSchema');
+  const Trailer = require('./models/articleSchema');
+  const Comment = require('./models/articleSchema');
 
 const 
   app = express(),
@@ -37,65 +40,6 @@ db.on("error", error => console.log(`Database Error: ${error}`));
 db.once("open", () => {
   console.log("Database connection sucessful");
 
-  /*************************
-    SCHEMAS
-  **************************/
-  const articlesSchema = new mongoose.Schema({
-    headline: String,
-    summary: String,
-    url: String,
-    postType: String,
-    comments: Array
-  })
-
-  const trailersSchema = new mongoose.Schema({
-    headline: String,
-    summary: String,
-    url: String,
-    postType: String,
-    comments: Array
-  });
-
-  const commentsSchema = new mongoose.Schema({
-    user_id: {
-      type: String,
-      required: "Must have" 
-    },
-    text: {
-      type: String
-    },
-    post_id: {
-      type: String
-    }
-    
-  });
-
-  const usersSchema = new mongoose.Schema({
-    firstName: {
-      type: String,
-      trim: true,
-      required: "Must have"
-    },
-    lasttName: {
-      type: String, 
-      trim: true,
-      required: "Must have"
-    },
-    userName: {
-      type: String,
-      trim: true,
-      required: "Must have"
-    }
-  });
-
-  // can add methods to Schemas to handle data
-
-  /*************************
-    MODELS
-  **************************/
-  const Article = mongoose.model("Article", articlesSchema);
-  const Trailer = mongoose.model("Trailer", trailersSchema);
-  const Comment = mongoose.model("Comment", commentsSchema)
 
   /*************************
    HOME PAGE
@@ -156,9 +100,6 @@ db.once("open", () => {
       });
     });
   
-
-
-
 
     /*************************
        GETTING ARTICLES
