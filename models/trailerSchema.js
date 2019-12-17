@@ -13,5 +13,5 @@ const mongoose = require("mongoose");
 
 const Trailer = mongoose.model("Trailer", trailersSchema);
 
-module.exports = Article;
+module.exports = Trailer;
   
