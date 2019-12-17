@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 
-
-
   const articlesSchema = new mongoose.Schema({
-    headline: String,
+    headline: {
+      type: String,
+    
+    },
     summary: String,
     url: String,
     postType: String,
@@ -11,7 +12,6 @@ const mongoose = require("mongoose");
   })
 
  
-
 const Article = mongoose.model("Article", articlesSchema);
 
 module.exports = Article;
