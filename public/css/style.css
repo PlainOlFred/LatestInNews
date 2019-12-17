@@ -1,0 +1,6 @@
+/* Scroll comment list */
+
+.comments_list {
+  overflow: scroll;
+  height: 200px;
+}
