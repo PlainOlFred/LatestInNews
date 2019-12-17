@@ -1,14 +1,14 @@
 const 
   express = require("express"),
   exphbs  = require('express-handlebars');
-  mongojs = require("mongojs"),
+  mongojs = require("mongojs"),  //???
   axios = require("axios"),
   cheerio = require("cheerio"),
   mongoose = require("mongoose");
 
   const Article = require('./models/articleSchema');
-  const Trailer = require('./models/articleSchema');
-  const Comment = require('./models/articleSchema');
+  const Trailer = require('./models/trailerSchema');
+  const Comment = require('./models/commentSchema');
 
 const 
   app = express(),
@@ -90,12 +90,23 @@ db.once("open", () => {
             .children("img")["0"].attribs.src;
 
         if (headline && summary && url && author && date && img && postType) {
-          let newArticle = new Article({ headline, summary, url, postType});
-          // (err, inserted) => err ? console.log(err) : console.log(inserted);
 
-          newArticle.save(function(err, newArticle) {
-            err ? console.error(err) : console.log(newArticle);
-          });
+          // let newArticle = new Article({ headline, summary, url, postType});
+          // newArticle.save(function(err, newArticle) {
+          //   err ? console.error(err) : console.log(newArticle);
+          // });
+
+          let newArticleObj = {
+            headline,
+            summary,
+            url,
+            postType
+          } 
+
+          (Article.create(newArticleObj))
+            .then(article => console.log(article))
+            .catch(err => console.log(err))
+            
         }
       });
     });
@@ -158,11 +169,20 @@ db.once("open", () => {
             .children("img")["0"].attribs.src;
 
         if (headline && summary && url && author && date && img && postType) {
-          let newTrailer = new Trailer({ headline, summary, url, postType});
+          // let newTrailer = new Trailer({ headline, summary, url, postType});
 
-          newTrailer.save((err, newTrailer) => {
-            err ? console.error(err) : console.log(newTrailer);
-          });
+          // newTrailer.save((err, newTrailer) => {
+          //   err ? console.error(err) : console.log(newTrailer);
+          // });
+
+          let newTrailerObj = {
+            user_id,
+            text,
+            post_id
+          } 
+        Trailer.create(newTrailerObj)
+          .then(trailer => console.log(trailer))
+          .catch(err => console.log(err));
         }
       });
     });
@@ -216,8 +236,7 @@ db.once("open", () => {
           console.log(err)
         } else {
           console.log(hbsObject)
-            
-          // res.render("comments", hbsObject)
+            // res.render("comments", hbsObject)
         }
         
       });
@@ -252,12 +271,23 @@ db.once("open", () => {
   console.log("posting comment");
   
   
-   let comment = new Comment({user_id, text, post_id});
+  //  let comment = new Comment({user_id, text, post_id});
+  //  comment.save(function(err, comment) {
+  //    err ? console.error(err) : console.log(comment)
+  //  })
 
-   comment.save(function(err, comment) {
-     err ? console.error(err) : console.log(comment)
-   })
-
+    let newCommentObj = {
+            user_id,
+            text,
+            post_id
+          } 
+    Comment.create(newCommentObj)
+      .then(comment => {
+        console.log("Here is a new comment"+comment);
+        res.redirect('back')
+        
+      })
+      .catch(err => console.log(err));
 
  })
 
