@@ -284,9 +284,8 @@ db.once("open", () => {
     Comment.create(newCommentObj)
       .then(comment => {
         console.log("Here is a new comment"+comment);
-        res.redirect('back')
-        
       })
+      .then(() => res.redirect('back'))
       .catch(err => console.log(err));
 
  })
