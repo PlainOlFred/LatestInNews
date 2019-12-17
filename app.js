@@ -43,13 +43,15 @@ db.once("open", () => {
   const articlesSchema = new mongoose.Schema({
     headline: String,
     summary: String,
-    url: String
+    url: String,
+    postType: String
   })
 
   const trailersSchema = new mongoose.Schema({
     headline: String,
     summary: String,
-    url: String
+    url: String,
+    postType: String
   });
 
   const CommentsSchema = new mongoose.Schema({
@@ -102,14 +104,21 @@ db.once("open", () => {
     GET ARTICLES 
   **************************/
   app.get("/articles", (req, res) => {
-    Article.find({}, (err, articles) => {
-      err ? console.log(err) : res.send(articles);
+    Article.find({}, function (err, articles){
+      
+      if (err) {
+        console.log(err)
+      } else {
+         let hbsObject = {
+            articles
+          };
+          console.log("Here" + hbsObject.articles);
+        res.render("home", hbsObject)
+      }
+      
     });
    
   });
-
-
- 
 
 
   /*************************
@@ -117,7 +126,15 @@ db.once("open", () => {
   **************************/
   app.get("/trailers", (req, res) => {
     Trailer.find({}, (err, trailers) => {
-      err ? console.log(err) : res.send(trailers);
+       if (err) {
+        console.log(err)
+      } else {
+         let hbsObject = {
+            trailers
+          };
+          console.log("Here" + hbsObject.trailers);
+        res.render("home", hbsObject)
+      }
     });
   });
 
@@ -132,7 +149,9 @@ db.once("open", () => {
     axios.get("https://www.cinemablend.com/news.php").then(response => {
       const $ = cheerio.load(response.data);
       $("div.story_item").each((i, element) => {
-        let headline = $(element)
+        let 
+          postType = 'article',
+          headline = $(element)
             .children("a")
             .attr("title"),
           summary = $(element)
@@ -155,8 +174,8 @@ db.once("open", () => {
             .children("a")
             .children("img")["0"].attribs.src;
 
-        if (headline && summary && url && author && date && img) {
-          let newArticle = new Article({ headline, summary, url });
+        if (headline && summary && url && author && date && img && postType) {
+          let newArticle = new Article({ headline, summary, url, postType});
           // (err, inserted) => err ? console.log(err) : console.log(inserted);
 
           newArticle.save(function(err, newArticle) {
@@ -175,7 +194,9 @@ db.once("open", () => {
     axios.get("https://www.cinemablend.com/trailers/").then(response => {
       let $ = cheerio.load(response.data);
       $("div.story_item").each((i, element) => {
-        let headline = $(element)
+        let 
+          postType = 'trailer',
+          headline = $(element)
             .children("a")
             .attr("title"),
           summary = $(element)
@@ -198,8 +219,8 @@ db.once("open", () => {
             .children("a")
             .children("img")["0"].attribs.src;
 
-        if (headline && summary && url && author && date && img) {
-          let newTrailer = new Trailer({ headline, summary, url });
+        if (headline && summary && url && author && date && img && postType) {
+          let newTrailer = new Trailer({ headline, summary, url, postType});
 
           newTrailer.save((err, newTrailer) => {
             err ? console.error(err) : console.log(newTrailer);
