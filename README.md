@@ -8,8 +8,8 @@ View the lastest in news and express your opinion
     - [X] Mongoose
     - [X] Cheerio
     - [X] Axios
-  - [ ] Deploy to Heroku
-  - [ ] Set up MLab provision  
+  - [X] Deploy to Heroku
+  - [X] Set up MLab provision  
   - [X] Scrape Stories from a news outlet to Database
     - [X] Headline
     - [X] Summary
