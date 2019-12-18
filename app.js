@@ -34,6 +34,7 @@ const db = mongoose.connection;
 db.on("error", error => console.log(`Database Error: ${error}`));
 
 
+
 /*************************
  ***DATABASE CONNCECTED***
 **************************/
@@ -46,6 +47,8 @@ db.once("open", () => {
   **************************/
   app.get('/', function (req, res) {
       res.render('home');
+
+
   });
 
   /*************************
@@ -60,7 +63,6 @@ db.once("open", () => {
   **************************/
   
     console.log("*****Scarpping Articles from Cinemblend *****");
-
     axios.get("https://www.cinemablend.com/news.php").then(response => {
       const $ = cheerio.load(response.data);
       $("div.story_item").each((i, element) => {
@@ -91,11 +93,6 @@ db.once("open", () => {
 
         if (headline && summary && url && author && date && img && postType) {
 
-          // let newArticle = new Article({ headline, summary, url, postType});
-          // newArticle.save(function(err, newArticle) {
-          //   err ? console.error(err) : console.log(newArticle);
-          // });
-
           let newArticleObj = {
             headline,
             summary,
@@ -103,10 +100,10 @@ db.once("open", () => {
             postType
           } 
 
-          (Article.create(newArticleObj))
+    
+          Article.findOneAndUpdate({url},newArticleObj,{upsert: true})
             .then(article => console.log(article))
-            .catch(err => console.log(err))
-            
+            .catch(err => console.log(err))  
         }
       });
     });
@@ -124,11 +121,9 @@ db.once("open", () => {
             articles
           };
           console.log("Here" + hbsObject.articles);
-        res.render("home", hbsObject)
+          res.render("index", hbsObject)
       }
-      
-    });
-   
+    }); 
   });
 
   /*************************
@@ -169,18 +164,14 @@ db.once("open", () => {
             .children("img")["0"].attribs.src;
 
         if (headline && summary && url && author && date && img && postType) {
-          // let newTrailer = new Trailer({ headline, summary, url, postType});
-
-          // newTrailer.save((err, newTrailer) => {
-          //   err ? console.error(err) : console.log(newTrailer);
-          // });
-
+         
           let newTrailerObj = {
-            user_id,
-            text,
-            post_id
+            headline,
+            summary,
+            url,
+            postType
           } 
-        Trailer.create(newTrailerObj)
+        Trailer.findOneAndUpdate({url},newTrailerObj,{upsert: true})
           .then(trailer => console.log(trailer))
           .catch(err => console.log(err));
         }
@@ -195,13 +186,20 @@ db.once("open", () => {
             trailers
           };
           console.log("Here" + hbsObject.trailers);
-        res.render("home", hbsObject)
+          res.render("index", hbsObject)
       }
     });
   });
 
+
+
+
   /*************************
-     COMMENT PAGE
+  *****COMMENT PAGE*********
+  **************************/
+
+ /*************************
+     Display Comments 
   **************************/
  app.get("/comments/:postType/:postId", (req, res) => {
    
@@ -213,29 +211,22 @@ db.once("open", () => {
    
    switch(postType) {
      case 'article':
-  
-       Article.find({_id: postId} , function (err, post){
-        
+      Article.find({_id: postId} , function (err, post){
         if (err) {
           console.log(err)
         } else {
           hbsObject.post = post;
-          console.log(hbsObject.post);
           // res.render("comments", hbsObject)
-        }
-        
+        } 
       });
-      
-       break;
+      break;
+    
     case 'trailer':
-      
-
-       Trailer.find({_id: postId} , function (err, post){
-      
+      Trailer.find({_id: postId} , function (err, post){
         if (err) {
           console.log(err)
         } else {
-          console.log(hbsObject)
+          hbsObject.post = post;
             // res.render("comments", hbsObject)
         }
         
@@ -247,25 +238,24 @@ db.once("open", () => {
    }
 
 
-   Comment.find({post_id: postId},  function (err, comments) {
+   Comment.find({post_id: postId}, /*null, {sort: {timestate: -1}}, */ function (err, comments) {
     if (err) {
           console.log(err)
         } else {
           hbsObject.comments = comments;
-            
            console.log(hbsObject); 
           res.render("comments", hbsObject)
         }
-
   })
-
-  
  })
 
+/*************************
+     Create Comments 
+  **************************/
  app.post("/api/comments/", (req,res) => {
    let 
     post_id = req.body.post_id,
-    user_id = 'USER DEFAULT',
+    user_id = 'DEFAULT USER',
     text = req.body.user_comment;
 
   console.log("posting comment");
@@ -290,15 +280,20 @@ db.once("open", () => {
 
  })
 
-app.get("comments/:postId", (req, res) => {
+/*************************
+    Delete Comment 
+  **************************/
+app.get("/api/comments/delete/:postId", (req, res) => {
   let postId = req.params.postId;
 
-  
+  console.log("deleting comment" + postId);
+
+  Comment.deleteOne({_id: postId})
+    .then(() => res.redirect('back'))
+    .catch(err => console.log(err));
+
 
 })
-
-  
-});
 
 /*************************
  *****Server STARTED*****
@@ -306,3 +301,8 @@ app.get("comments/:postId", (req, res) => {
 app.listen(PORT, () => {
   console.log(`App running on http://localhost:${PORT}`);
 });
+
+  
+});
+
+
