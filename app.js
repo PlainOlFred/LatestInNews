@@ -40,6 +40,15 @@ mongoose.connect(MONGODB_URI, {
 const db = mongoose.connection;
 db.on("error", error => console.log(`Database Error: ${error}`));
 
+/*************************
+   HOME PAGE
+  **************************/
+  app.get('/', function (req, res) {
+      res.render('home');
+
+
+  });
+
 
 
 /*************************
@@ -49,14 +58,7 @@ db.once("open", () => {
   console.log("Database connection sucessful");
 
 
-  /*************************
-   HOME PAGE
-  **************************/
-  app.get('/', function (req, res) {
-      res.render('home');
-
-
-  });
+  
 
   /*************************
     SCRAPE AND GET ARTICLES 
