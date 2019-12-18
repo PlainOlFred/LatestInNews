@@ -1,7 +1,22 @@
 <li class="collection-item avatar">
-  <img src="images/yuna.jpg" alt="" class="circle">
-  <span class="title">{{user_id}}</span>
-  <p>{{text}}<br>
-    Date
-  </p>
+  <div class="row">
+    <div class="col s8">
+      <img src="images/yuna.jpg" alt="" class="circle">
+      <span class="title">{{user_id}}: </span>
+      <span>{{text}}</span>
+      <p>Date</p>
+      <p>{{_id}}</p>
+        
+      
+    </div>
+    <div class="col s2 offset-s2">
+      <form action="/api/comments/delete/{{_id}}" method="get">
+        <button class="btn waves-effects waves dark" type="submit" name="action">Delete</button>
+      </form>
+
+    </div>
+    
+
+  </div>
+  
 </li>
