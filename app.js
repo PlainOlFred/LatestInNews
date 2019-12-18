@@ -12,7 +12,7 @@ const
 
 const 
   app = express(),
-  PORT = process.env.PORT || 3500;
+  PORT = process.env.PORT || 3000;
 
 app.use(express.static("public")); //???
 app.use(express.urlencoded({ extended: true }));
@@ -25,10 +25,17 @@ app.set('view engine', 'handlebars');
 /*************************
    Mongoose ORM
 **************************/
-mongoose.connect("mongodb://localhost/latestInNews", {
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+
+mongoose.connect(MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
-});
+} );
+
+// mongoose.connect("mongodb://localhost/latestInNews", {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// });
 
 const db = mongoose.connection;
 db.on("error", error => console.log(`Database Error: ${error}`));
