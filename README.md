@@ -2,7 +2,12 @@
 View the lastest in news and express your opinion 
 
 ## MVP
-  - [X] Use Express, Express-handlebars, Mongoose, Cheerion, and Axios
+  - [X] Use the all 5  
+    - [X] Express
+    - [X] Express-handlebars
+    - [X] Mongoose
+    - [X] Cheerio
+    - [X] Axios
   - [ ] Deploy to Heroku
   - [ ] Set up MLab provision  
   - [X] Scrape Stories from a news outlet to Database
@@ -11,8 +16,9 @@ View the lastest in news and express your opinion
     - [X] URL
     - [X] Additional content
   - [X] User able to leave comments saved to Database
-  - [ ] User able to delete comments 
+  - [X] User able to delete comments 
   - [X] User able to view all comments
+  
 
 ## Developmental Features
   - [ ] Show dates for comments
