@@ -38,9 +38,9 @@ View the lastest in news and express your opinion
 ## Usage
 - [Open App](https://intense-brook-89930.herokuapp.com/)
 - Browse movie articles and trailers
-  > ![](./public/img/browse.gif)
-- Select post you want to comment on
   > ![](./public/img/homepage.gif)
+- Select post you want to comment on
+  > ![](./public/img/browse.gif)
 - Enter Comment
   > ![](./public/img/enter_comment.gif)
 - Come back later to review or delete your comment
